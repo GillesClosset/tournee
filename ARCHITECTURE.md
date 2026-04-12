@@ -1,11 +1,11 @@
 # Architecture Technique — Tournée Nath
 
-| Champ | Valeur |
-|-------|--------|
-| **Version** | 1.0 |
-| **Date** | 2026-04-12 |
+| Champ                | Valeur      |
+| -------------------- | ----------- |
+| **Version**          | 1.0         |
+| **Date**             | 2026-04-12  |
 | **PRD de référence** | PRD.md v1.0 |
-| **Statut** | Draft |
+| **Statut**           | Draft       |
 
 ---
 
@@ -30,28 +30,28 @@
 
 > **Règle absolue** : utiliser la dernière version stable de chaque dépendance au moment du `create-next-app`. Vérifier via `npm info <package> version` avant chaque ajout.
 
-| Technologie | Version cible | Rôle |
-|------------|---------------|------|
-| **Next.js** | ^15.5 (App Router) | Framework fullstack (SSR + API Routes) |
-| **React** | ^19.0 | UI library |
-| **TypeScript** | ^5.9 | Typage statique |
-| **Tailwind CSS** | ^4.0 | Utility-first CSS |
-| **shadcn/ui** | latest (CLI) | Composants UI accessibles |
-| **Supabase** | @supabase/supabase-js ^2.45 + @supabase/ssr | BDD + Auth |
-| **ExcelJS** | ^4.4 | Lecture/écriture Excel (.xlsx) |
-| **Zod** | ^3.23 | Validation de schémas (API + forms) |
-| **React Hook Form** | ^7.53 | Gestion des formulaires |
-| **dnd-kit** | @dnd-kit/core ^6 | Drag & drop pour réordonnancement |
-| **date-fns** | ^4.1 | Manipulation de dates/heures |
-| **Lucide React** | latest | Icônes |
+| Technologie         | Version cible                               | Rôle                                   |
+| ------------------- | ------------------------------------------- | -------------------------------------- |
+| **Next.js**         | ^15.5 (App Router)                          | Framework fullstack (SSR + API Routes) |
+| **React**           | ^19.0                                       | UI library                             |
+| **TypeScript**      | ^5.9                                        | Typage statique                        |
+| **Tailwind CSS**    | ^4.0                                        | Utility-first CSS                      |
+| **shadcn/ui**       | latest (CLI)                                | Composants UI accessibles              |
+| **Supabase**        | @supabase/supabase-js ^2.45 + @supabase/ssr | BDD + Auth                             |
+| **ExcelJS**         | ^4.4                                        | Lecture/écriture Excel (.xlsx)         |
+| **Zod**             | ^3.23                                       | Validation de schémas (API + forms)    |
+| **React Hook Form** | ^7.53                                       | Gestion des formulaires                |
+| **dnd-kit**         | @dnd-kit/core ^6                            | Drag & drop pour réordonnancement      |
+| **date-fns**        | ^4.1                                        | Manipulation de dates/heures           |
+| **Lucide React**    | latest                                      | Icônes                                 |
 
 ### Dépendances de développement
 
-| Technologie | Rôle |
-|------------|------|
-| **ESLint** | Linting (config Next.js) |
-| **Prettier** | Formatage |
-| **Vitest** | Tests unitaires |
+| Technologie    | Rôle                      |
+| -------------- | ------------------------- |
+| **ESLint**     | Linting (config Next.js)  |
+| **Prettier**   | Formatage                 |
+| **Vitest**     | Tests unitaires           |
 | **Playwright** | Tests E2E (si nécessaire) |
 
 ---
@@ -662,6 +662,7 @@ vehicles ──┘         │                                  │
 ## 4. Contrats API
 
 ### Convention générale
+
 - **Base path** : `/api/`
 - **Format** : JSON
 - **Auth** : Bearer token (Supabase session) — vérifié par middleware
@@ -672,7 +673,9 @@ vehicles ──┘         │                                  │
 ### 4.1 Référentiels
 
 #### `GET /api/drivers`
+
 Retourne la liste des chauffeurs.
+
 ```typescript
 // Response 200
 {
@@ -686,6 +689,7 @@ Retourne la liste des chauffeurs.
 ```
 
 #### `POST /api/drivers`
+
 ```typescript
 // Request
 { name: string, notes?: string }
@@ -694,6 +698,7 @@ Retourne la liste des chauffeurs.
 ```
 
 #### `PATCH /api/drivers`
+
 ```typescript
 // Request
 { id: string, name?: string, is_active?: boolean, notes?: string }
@@ -701,20 +706,24 @@ Retourne la liste des chauffeurs.
 { data: Driver }
 ```
 
-*(Même pattern pour `/api/vehicles` et `/api/locations`)*
+_(Même pattern pour `/api/vehicles` et `/api/locations`)_
 
 #### `POST /api/locations/geocode`
+
 Géocode une adresse et retourne les coordonnées.
+
 ```typescript
 // Request
-{ address: string }
+{
+  address: string
+}
 // Response 200
 {
   data: {
     latitude: number
     longitude: number
     formatted_address: string
-    confidence: number  // 0-1
+    confidence: number // 0-1
   }
 }
 ```
@@ -722,13 +731,15 @@ Géocode une adresse et retourne les coordonnées.
 ### 4.2 Planning
 
 #### `GET /api/schedules`
+
 Liste des semaines planifiées.
+
 ```typescript
 // Response 200
 {
   data: Array<{
     id: string
-    week_start_date: string  // ISO date
+    week_start_date: string // ISO date
     status: ScheduleStatus
     mission_count: number
     tour_count: number
@@ -737,25 +748,33 @@ Liste des semaines planifiées.
 ```
 
 #### `POST /api/schedules`
+
 Créer une nouvelle semaine.
+
 ```typescript
 // Request
-{ week_start_date: string }
+{
+  week_start_date: string
+}
 // Response 201
-{ data: WeeklySchedule }
+{
+  data: WeeklySchedule
+}
 ```
 
 #### `GET /api/schedules/[scheduleId]/availabilities`
+
 Retourne les disponibilités chauffeurs de la semaine.
+
 ```typescript
 // Response 200
 {
   data: Array<{
     id: string
-    driver: { id: string, name: string }
-    vehicle: { id: string, name: string, license_plate: string } | null
+    driver: { id: string; name: string }
+    vehicle: { id: string; name: string; license_plate: string } | null
     day_of_week: number
-    start_time: string  // "HH:mm"
+    start_time: string // "HH:mm"
     end_time: string
     is_available: boolean
   }>
@@ -763,7 +782,9 @@ Retourne les disponibilités chauffeurs de la semaine.
 ```
 
 #### `PUT /api/schedules/[scheduleId]/availabilities`
+
 Met à jour toutes les disponibilités de la semaine (bulk upsert).
+
 ```typescript
 // Request
 {
@@ -783,7 +804,9 @@ Met à jour toutes les disponibilités de la semaine (bulk upsert).
 ### 4.3 Import
 
 #### `POST /api/schedules/[scheduleId]/import`
+
 Import du fichier Excel des demandes.
+
 ```typescript
 // Request: multipart/form-data
 // Field: file (xlsx)
@@ -811,7 +834,9 @@ Import du fichier Excel des demandes.
 ```
 
 #### `POST /api/schedules/[scheduleId]/import/confirm`
+
 Confirme l'import après résolution des erreurs.
+
 ```typescript
 // Request
 {
@@ -832,7 +857,9 @@ Confirme l'import après résolution des erreurs.
 ### 4.4 Génération
 
 #### `POST /api/schedules/[scheduleId]/generate`
+
 Lance la génération des tournées optimisées.
+
 ```typescript
 // Request (optionnel)
 {
@@ -875,14 +902,18 @@ Lance la génération des tournées optimisées.
 ### 4.5 Tournées (CRUD + édition)
 
 #### `GET /api/schedules/[scheduleId]/tours`
+
 Retourne toutes les tournées de la semaine.
+
 ```typescript
 // Response 200
 { data: Tour[] }  // Avec stops inclus, triés par day_of_week puis start_time
 ```
 
 #### `PATCH /api/schedules/[scheduleId]/tours/[tourId]/stops`
+
 Met à jour les arrêts d'une tournée (réordonnancement, suppression, ajout).
+
 ```typescript
 // Request
 {
@@ -918,7 +949,9 @@ Met à jour les arrêts d'une tournée (réordonnancement, suppression, ajout).
 ### 4.6 Export
 
 #### `GET /api/schedules/[scheduleId]/export`
+
 Génère et retourne le fichier Excel de sortie.
+
 ```typescript
 // Response 200
 // Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
@@ -929,7 +962,9 @@ Génère et retourne le fichier Excel de sortie.
 ### 4.7 Routage (interne)
 
 #### `POST /api/routing/matrix`
+
 Calcule la matrice des temps de trajet (avec cache).
+
 ```typescript
 // Request
 {
@@ -1023,13 +1058,13 @@ L'éditeur de tournées (`tournees/page.tsx`) est la vue la plus complexe :
 
 Approche **Server Components + Client Components ciblés** :
 
-| Donnée | Stratégie | Justification |
-|--------|-----------|---------------|
-| Référentiels (CRUD) | Server Components + Server Actions | Données stables, rafraîchies à la navigation |
-| Configuration semaine | Server Component + formulaire client | Formulaire complexe (grille) |
-| Import/validation | Client Component | Upload fichier + interactions dynamiques |
-| Tournées (éditeur) | Client Component + hooks | Drag & drop, modifications fréquentes, recalcul temps réel |
-| Tournées (données) | `useSWR` ou `React Query` | Cache côté client, revalidation optimiste |
+| Donnée                | Stratégie                            | Justification                                              |
+| --------------------- | ------------------------------------ | ---------------------------------------------------------- |
+| Référentiels (CRUD)   | Server Components + Server Actions   | Données stables, rafraîchies à la navigation               |
+| Configuration semaine | Server Component + formulaire client | Formulaire complexe (grille)                               |
+| Import/validation     | Client Component                     | Upload fichier + interactions dynamiques                   |
+| Tournées (éditeur)    | Client Component + hooks             | Drag & drop, modifications fréquentes, recalcul temps réel |
+| Tournées (données)    | `useSWR` ou `React Query`            | Cache côté client, revalidation optimiste                  |
 
 L'éditeur de tournées utilise un **état local riche** (React state) avec synchronisation serveur via API calls lors des modifications. Pas de store global (Redux/Zustand) nécessaire — la complexité est confinée à l'éditeur.
 
@@ -1041,23 +1076,25 @@ L'éditeur de tournées utilise un **état local riche** (React state) avec sync
 
 **Décision** : Maximiser les Server Components. Seuls les composants nécessitant de l'interactivité sont des Client Components.
 
-| Server Components | Client Components |
-|-------------------|-------------------|
-| Pages de listing (chauffeurs, véhicules, lieux) | Formulaires d'édition (modals) |
-| Page de planning (liste des semaines) | Grille de disponibilités |
-| Layout, navigation | Zone d'upload Excel |
-| | Éditeur de tournées (drag & drop) |
-| | Composants avec toast/notifications |
+| Server Components                               | Client Components                   |
+| ----------------------------------------------- | ----------------------------------- |
+| Pages de listing (chauffeurs, véhicules, lieux) | Formulaires d'édition (modals)      |
+| Page de planning (liste des semaines)           | Grille de disponibilités            |
+| Layout, navigation                              | Zone d'upload Excel                 |
+|                                                 | Éditeur de tournées (drag & drop)   |
+|                                                 | Composants avec toast/notifications |
 
 ### DT2 : Gestion des formulaires
 
 **Décision** : React Hook Form + Zod pour tous les formulaires.
+
 - Les schémas Zod sont partagés entre validation client et serveur.
 - Les erreurs serveur sont propagées dans les champs du formulaire.
 
 ### DT3 : Drag & Drop
 
 **Décision** : `@dnd-kit/core` + `@dnd-kit/sortable`.
+
 - Supporte le drag intra-liste (réordonnancement) et inter-listes (déplacement entre chauffeurs).
 - Accessible (clavier supporté).
 - Léger (~10kb gzipped).
@@ -1065,6 +1102,7 @@ L'éditeur de tournées utilise un **état local riche** (React state) avec sync
 ### DT4 : Matching fuzzy des noms de lieux
 
 **Décision** : Algorithme de distance de Levenshtein normalisé, côté serveur.
+
 - Seuil de matching : score > 0.7 (sur 0-1).
 - Si plusieurs matchs > 0.7 : proposer les 3 meilleurs à l'utilisateur.
 - Si aucun match > 0.7 : signaler comme non résolu.
@@ -1075,6 +1113,7 @@ Implémentation en TypeScript pur (pas de dépendance externe).
 ### DT5 : Gestion des heures
 
 **Décision** : `date-fns` pour toutes les manipulations de dates/heures.
+
 - Les heures sont stockées en `TIME` PostgreSQL (sans timezone).
 - Le parsing des heures variées de l'Excel (cf. `time-parser.ts`) produit un `string` au format `HH:mm`.
 - Les calculs de durée utilisent des minutes entières (arrondi supérieur).
@@ -1087,7 +1126,14 @@ Implémentation en TypeScript pur (pas de dépendance externe).
 // mission-classifier.ts
 const MISSION_TYPE_KEYWORDS = {
   accompagnement: ['accompagnement', 'accompagner', 'accompagnment', 'déposer', 'emmener'],
-  recuperation: ['récupération', 'récupérer', 'raccompagner', 'raccompagnement', 'retour', 'ramener'],
+  recuperation: [
+    'récupération',
+    'récupérer',
+    'raccompagner',
+    'raccompagnement',
+    'retour',
+    'ramener',
+  ],
 }
 
 const ACCOMPANIMENT_TYPE_KEYWORDS = {
@@ -1125,15 +1171,18 @@ interface ORSDirectionsResponse {
 }
 
 interface ORSMatrixResponse {
-  durations: number[][]  // secondes
-  distances: number[][]  // mètres
+  durations: number[][] // secondes
+  distances: number[][] // mètres
 }
 
 class ORSClient {
   private apiKey: string
   private baseUrl: string
 
-  async getDirections(from: [number, number], to: [number, number]): Promise<{
+  async getDirections(
+    from: [number, number],
+    to: [number, number],
+  ): Promise<{
     duration_seconds: number
     distance_meters: number
   }>
@@ -1159,7 +1208,7 @@ class ORSClient {
 
 class RoutingService {
   private orsClient: ORSClient
-  private osrmClient: OSRMClient  // fallback
+  private osrmClient: OSRMClient // fallback
 
   /**
    * Calcule la matrice de temps de trajet entre les locations.
@@ -1181,11 +1230,11 @@ class RoutingService {
 
 ### Limites et quotas
 
-| Endpoint | Limite gratuite | Notre usage estimé/semaine | Marge |
-|----------|----------------|--------------------------|-------|
-| Directions | 2000/jour | ~50-100 (nouvelles paires) | Large |
-| Matrix | 500/jour (max 50×50) | ~5-10 (batch par jour) | Large |
-| Geocoding | 2000/jour | ~5-10 (nouveaux lieux) | Large |
+| Endpoint   | Limite gratuite      | Notre usage estimé/semaine | Marge |
+| ---------- | -------------------- | -------------------------- | ----- |
+| Directions | 2000/jour            | ~50-100 (nouvelles paires) | Large |
+| Matrix     | 500/jour (max 50×50) | ~5-10 (batch par jour)     | Large |
+| Geocoding  | 2000/jour            | ~5-10 (nouveaux lieux)     | Large |
 
 Grâce au cache, après les premières semaines, l'usage API sera minimal.
 
@@ -1199,11 +1248,11 @@ Grâce au cache, après les premières semaines, l'usage API sera minimal.
 // src/lib/optimizer/types.ts
 
 interface OptimizationInput {
-  missions: MissionRequest[]               // Demandes du jour
-  availabilities: DriverAvailability[]     // Chauffeurs disponibles ce jour
-  travelMatrix: TravelTimeMatrix           // Matrice des temps de trajet
-  depot: { lat: number; lng: number }      // 117 av Simone Veil
-  preservedStops?: TourStop[]              // Arrêts à ne pas toucher (re-génération)
+  missions: MissionRequest[] // Demandes du jour
+  availabilities: DriverAvailability[] // Chauffeurs disponibles ce jour
+  travelMatrix: TravelTimeMatrix // Matrice des temps de trajet
+  depot: { lat: number; lng: number } // 117 av Simone Veil
+  preservedStops?: TourStop[] // Arrêts à ne pas toucher (re-génération)
 }
 
 interface OptimizationOutput {
@@ -1223,7 +1272,7 @@ interface GeneratedTour {
 interface GeneratedStop {
   missionRequestId: string
   locationId: string
-  scheduledTime: string            // HH:mm
+  scheduledTime: string // HH:mm
   travelTimeMinutes: number
   parkingExtraMinutes: number
   accompanimentExtraMinutes: number
@@ -1300,10 +1349,12 @@ departure_time[0] = driver_start_time          // L'heure de début de la plage 
 ### 8.4 Gestion des plages horaires (missions avec durée)
 
 Quand une mission a une plage (ex: "15h-16h") :
+
 1. **Sans indication supplémentaire** = aller-retour. Le chauffeur dépose, revient plus tard récupérer (ou un autre chauffeur récupère).
 2. **Avec indication** = suivre l'indication textuelle.
 
 Le système crée **deux stops** pour un A/R :
+
 - Stop A : aller (accompagnement) à `time_range_start`
 - Stop B : retour (récupération) à `time_range_end`
 
@@ -1320,12 +1371,12 @@ Ces deux stops peuvent être attribués à des chauffeurs différents si c'est p
 
 interface ParsedRow {
   row_number: number
-  day_text: string              // Ex: "Lundi 16-Mars"
-  day_of_week: number           // 1-7
-  location_name: string         // Ex: "Clair-Castel"
-  location_id: string | null    // Résolu si match
-  time_text: string             // Ex: "8h30", "15h-16h"
-  requested_time: string        // Normalisé "HH:mm"
+  day_text: string // Ex: "Lundi 16-Mars"
+  day_of_week: number // 1-7
+  location_name: string // Ex: "Clair-Castel"
+  location_id: string | null // Résolu si match
+  time_text: string // Ex: "8h30", "15h-16h"
+  requested_time: string // Normalisé "HH:mm"
   time_range_end: string | null // Si plage horaire
   minor_name: string | null
   mission_text: string
@@ -1397,7 +1448,7 @@ function parseTime(raw: string): {
 async function generateExportExcel(
   schedule: WeeklySchedule,
   tours: Tour[],
-  availabilities: DriverAvailability[]
+  availabilities: DriverAvailability[],
 ): Promise<ExcelJS.Workbook>
 ```
 
@@ -1436,6 +1487,7 @@ ORS_BASE_URL=https://api.openrouteservice.org
 ```
 
 ### Données sensibles
+
 - Les noms de mineurs sont des données sensibles (RGPD, protection de l'enfance).
 - Pas de logging des noms en clair dans les logs serveur.
 - Pas de partage de données avec des services tiers (sauf routage : seules les coordonnées GPS sont envoyées à ORS, jamais les noms).
@@ -1457,105 +1509,111 @@ Setup     Référ.    Config    Import    Génér.    Export
 ---
 
 #### Lot 0 : Scaffolding & Infrastructure
+
 **Objectif** : Projet bootable, déployable, avec DB prête.
 
-| Tâche | Fichiers |
-|-------|----------|
+| Tâche                                                   | Fichiers                                          |
+| ------------------------------------------------------- | ------------------------------------------------- |
 | `create-next-app` avec TypeScript, Tailwind, App Router | `next.config.ts`, `tsconfig.json`, `package.json` |
-| Installer shadcn/ui + composants de base | `src/components/ui/*` |
-| Configurer Supabase (projet + .env) | `.env.local`, `.env.example` |
-| Créer toutes les migrations SQL | `supabase/migrations/*` |
-| Exécuter les migrations + seed | Via Supabase Dashboard ou CLI |
-| Configurer le layout racine + sidebar | `src/app/layout.tsx`, `src/components/layout/*` |
-| Configurer ESLint + Prettier | `.eslintrc.json`, `.prettierrc` |
-| Premier déploiement Vercel (vide) | `vercel.json` (si nécessaire) |
+| Installer shadcn/ui + composants de base                | `src/components/ui/*`                             |
+| Configurer Supabase (projet + .env)                     | `.env.local`, `.env.example`                      |
+| Créer toutes les migrations SQL                         | `supabase/migrations/*`                           |
+| Exécuter les migrations + seed                          | Via Supabase Dashboard ou CLI                     |
+| Configurer le layout racine + sidebar                   | `src/app/layout.tsx`, `src/components/layout/*`   |
+| Configurer ESLint + Prettier                            | `.eslintrc.json`, `.prettierrc`                   |
+| Premier déploiement Vercel (vide)                       | `vercel.json` (si nécessaire)                     |
 
 **Validation** : L'app se lance en local, la DB est accessible, le layout s'affiche.
 
 ---
 
 #### Lot 1 : Authentification & Référentiels (Epic 1 + Epic 7)
+
 **Objectif** : Nath peut se connecter et gérer ses chauffeurs, véhicules et points de passage.
 
-| Tâche | Fichiers |
-|-------|----------|
-| Page login + Supabase Auth | `src/app/login/page.tsx` |
-| Middleware auth | `src/middleware.ts`, `src/lib/supabase/*` |
-| CRUD Chauffeurs | `src/app/referentiels/chauffeurs/page.tsx`, `src/app/api/drivers/route.ts`, composants |
-| CRUD Véhicules | `src/app/referentiels/vehicules/page.tsx`, `src/app/api/vehicles/route.ts`, composants |
-| CRUD Points de passage + géocodage | `src/app/referentiels/points-de-passage/page.tsx`, `src/app/api/locations/*`, composants |
-| Service de géocodage (ORS + fallback) | `src/lib/routing/geocoding.ts`, `src/lib/routing/ors-client.ts` |
-| Schemas Zod pour validation | `src/lib/validators/*` |
+| Tâche                                 | Fichiers                                                                                 |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Page login + Supabase Auth            | `src/app/login/page.tsx`                                                                 |
+| Middleware auth                       | `src/middleware.ts`, `src/lib/supabase/*`                                                |
+| CRUD Chauffeurs                       | `src/app/referentiels/chauffeurs/page.tsx`, `src/app/api/drivers/route.ts`, composants   |
+| CRUD Véhicules                        | `src/app/referentiels/vehicules/page.tsx`, `src/app/api/vehicles/route.ts`, composants   |
+| CRUD Points de passage + géocodage    | `src/app/referentiels/points-de-passage/page.tsx`, `src/app/api/locations/*`, composants |
+| Service de géocodage (ORS + fallback) | `src/lib/routing/geocoding.ts`, `src/lib/routing/ors-client.ts`                          |
+| Schemas Zod pour validation           | `src/lib/validators/*`                                                                   |
 
 **Validation** : Nath peut se connecter, créer les 4 chauffeurs, 2 véhicules, et au moins 3 points de passage avec adresses géocodées.
 
 ---
 
 #### Lot 2 : Configuration Hebdomadaire (Epic 2)
+
 **Objectif** : Nath peut créer une semaine et configurer les disponibilités chauffeurs.
 
-| Tâche | Fichiers |
-|-------|----------|
-| Page liste des semaines + création | `src/app/planning/page.tsx`, `src/app/api/schedules/route.ts` |
-| Grille de disponibilités (7 jours × 4 chauffeurs) | `src/app/planning/[weekId]/configuration/page.tsx`, `src/components/planning/availability-grid.tsx` |
-| API CRUD disponibilités (bulk upsert) | `src/app/api/schedules/[scheduleId]/availabilities/route.ts` |
-| Duplication semaine précédente | Intégré dans la page planning |
-| Validation contrainte véhicule (pas de doublon simultané) | `src/lib/validators/availability.schema.ts` |
+| Tâche                                                     | Fichiers                                                                                            |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Page liste des semaines + création                        | `src/app/planning/page.tsx`, `src/app/api/schedules/route.ts`                                       |
+| Grille de disponibilités (7 jours × 4 chauffeurs)         | `src/app/planning/[weekId]/configuration/page.tsx`, `src/components/planning/availability-grid.tsx` |
+| API CRUD disponibilités (bulk upsert)                     | `src/app/api/schedules/[scheduleId]/availabilities/route.ts`                                        |
+| Duplication semaine précédente                            | Intégré dans la page planning                                                                       |
+| Validation contrainte véhicule (pas de doublon simultané) | `src/lib/validators/availability.schema.ts`                                                         |
 
 **Validation** : Nath peut créer la semaine du 6 avril, configurer Yannick 8h-18h30, Solange 7h-14h, Ali 15h-23h avec les bons véhicules.
 
 ---
 
 #### Lot 3 : Import Excel (Epic 3)
+
 **Objectif** : Nath peut importer l'Excel des demandes et voir les missions parsées/validées.
 
-| Tâche | Fichiers |
-|-------|----------|
-| Zone d'upload avec dropzone | `src/app/planning/[weekId]/import/page.tsx`, `src/components/planning/import-dropzone.tsx` |
-| Parser Excel complet | `src/lib/excel/import-parser.ts`, `src/lib/excel/time-parser.ts` |
-| Classification des missions | `src/lib/excel/mission-classifier.ts` |
-| Matching fuzzy des lieux | `src/lib/excel/location-matcher.ts`, `src/lib/utils/fuzzy-match.ts` |
-| API d'import | `src/app/api/schedules/[scheduleId]/import/route.ts` |
+| Tâche                              | Fichiers                                                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Zone d'upload avec dropzone        | `src/app/planning/[weekId]/import/page.tsx`, `src/components/planning/import-dropzone.tsx`         |
+| Parser Excel complet               | `src/lib/excel/import-parser.ts`, `src/lib/excel/time-parser.ts`                                   |
+| Classification des missions        | `src/lib/excel/mission-classifier.ts`                                                              |
+| Matching fuzzy des lieux           | `src/lib/excel/location-matcher.ts`, `src/lib/utils/fuzzy-match.ts`                                |
+| API d'import                       | `src/app/api/schedules/[scheduleId]/import/route.ts`                                               |
 | Interface de validation/résolution | `src/components/planning/import-validation.tsx`, `src/components/planning/unresolved-location.tsx` |
-| Confirmation d'import | API confirm + stockage en base |
-| Tests unitaires du parser | `tests/unit/excel/*` |
+| Confirmation d'import              | API confirm + stockage en base                                                                     |
+| Tests unitaires du parser          | `tests/unit/excel/*`                                                                               |
 
 **Validation** : Importer l'exemple "Exemple de tableau de demandes en entrée_6avril.xlsx" et vérifier que toutes les missions sont correctement parsées, classifiées, et les lieux résolus.
 
 ---
 
 #### Lot 4 : Génération & Édition des Tournées (Epic 4 + Epic 5)
+
 **Objectif** : Nath peut générer les tournées et les ajuster manuellement.
 
-| Tâche | Fichiers |
-|-------|----------|
-| Service de routage avec cache | `src/lib/routing/routing-service.ts`, `src/lib/routing/ors-client.ts`, `src/lib/routing/osrm-client.ts` |
-| API matrice de trajet | `src/app/api/routing/matrix/route.ts` |
-| Algorithme d'optimisation complet | `src/lib/optimizer/*` (tous les fichiers) |
-| API génération | `src/app/api/schedules/[scheduleId]/generate/route.ts` |
-| Éditeur de tournées (vue colonnes) | `src/app/planning/[weekId]/tournees/page.tsx`, `src/components/tournees/*` |
-| Drag & drop (réordonnancement + déplacement inter-chauffeur) | `src/components/tournees/tour-stop-card.tsx` avec dnd-kit |
-| Modification horaire, annulation stop | API PATCH stops |
-| Ajout tâche manuelle | `src/components/tournees/manual-task-form.tsx` |
-| Système d'alertes (dépassement, priorité) | `src/components/tournees/tour-alerts.tsx` |
-| Re-génération partielle (preserve_confirmed_stops) | Option dans l'API generate |
-| Tests unitaires de l'optimiseur | `tests/unit/optimizer/*` |
+| Tâche                                                        | Fichiers                                                                                                |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Service de routage avec cache                                | `src/lib/routing/routing-service.ts`, `src/lib/routing/ors-client.ts`, `src/lib/routing/osrm-client.ts` |
+| API matrice de trajet                                        | `src/app/api/routing/matrix/route.ts`                                                                   |
+| Algorithme d'optimisation complet                            | `src/lib/optimizer/*` (tous les fichiers)                                                               |
+| API génération                                               | `src/app/api/schedules/[scheduleId]/generate/route.ts`                                                  |
+| Éditeur de tournées (vue colonnes)                           | `src/app/planning/[weekId]/tournees/page.tsx`, `src/components/tournees/*`                              |
+| Drag & drop (réordonnancement + déplacement inter-chauffeur) | `src/components/tournees/tour-stop-card.tsx` avec dnd-kit                                               |
+| Modification horaire, annulation stop                        | API PATCH stops                                                                                         |
+| Ajout tâche manuelle                                         | `src/components/tournees/manual-task-form.tsx`                                                          |
+| Système d'alertes (dépassement, priorité)                    | `src/components/tournees/tour-alerts.tsx`                                                               |
+| Re-génération partielle (preserve_confirmed_stops)           | Option dans l'API generate                                                                              |
+| Tests unitaires de l'optimiseur                              | `tests/unit/optimizer/*`                                                                                |
 
 **Validation** : Générer les tournées pour la semaine du 6 avril, vérifier la cohérence avec l'exemple de sortie, tester le drag & drop, vérifier les alertes de dépassement.
 
 ---
 
 #### Lot 5 : Export & Ré-import (Epic 6)
+
 **Objectif** : Nath peut exporter le planning au format Excel attendu et ré-importer un planning pour modification.
 
-| Tâche | Fichiers |
-|-------|----------|
-| Générateur Excel de sortie | `src/lib/excel/export-generator.ts` |
-| API d'export | `src/app/api/schedules/[scheduleId]/export/route.ts` |
-| Page d'export avec preview | `src/app/planning/[weekId]/export/page.tsx` |
-| Parser de ré-import (Excel tournée → tours) | `src/lib/excel/tour-reimport.ts` |
-| Dashboard page d'accueil | `src/app/page.tsx` |
-| Tests de conformité du format de sortie | Comparaison avec "Exemple de Planning final à générer_6avril.xlsx" |
+| Tâche                                       | Fichiers                                                           |
+| ------------------------------------------- | ------------------------------------------------------------------ |
+| Générateur Excel de sortie                  | `src/lib/excel/export-generator.ts`                                |
+| API d'export                                | `src/app/api/schedules/[scheduleId]/export/route.ts`               |
+| Page d'export avec preview                  | `src/app/planning/[weekId]/export/page.tsx`                        |
+| Parser de ré-import (Excel tournée → tours) | `src/lib/excel/tour-reimport.ts`                                   |
+| Dashboard page d'accueil                    | `src/app/page.tsx`                                                 |
+| Tests de conformité du format de sortie     | Comparaison avec "Exemple de Planning final à générer_6avril.xlsx" |
 
 **Validation** : Exporter les tournées générées, comparer le format avec l'exemple fourni (mêmes onglets, mêmes en-têtes, même structure). Ré-importer le fichier exporté et vérifier que les données sont intactes.
 
@@ -1563,15 +1621,15 @@ Setup     Référ.    Config    Import    Génér.    Export
 
 ### Estimation globale
 
-| Lot | Effort estimé | Dépendances |
-|-----|--------------|-------------|
-| Lot 0 : Scaffolding | 1-2 sessions | Aucune |
-| Lot 1 : Auth + Référentiels | 2-3 sessions | Lot 0 |
-| Lot 2 : Config semaine | 1-2 sessions | Lot 1 |
-| Lot 3 : Import Excel | 2-3 sessions | Lot 2 |
-| Lot 4 : Génération + Édition | 4-5 sessions | Lot 3 |
-| Lot 5 : Export + Ré-import | 2-3 sessions | Lot 4 |
-| **Total** | **12-18 sessions** | |
+| Lot                          | Effort estimé      | Dépendances |
+| ---------------------------- | ------------------ | ----------- |
+| Lot 0 : Scaffolding          | 1-2 sessions       | Aucune      |
+| Lot 1 : Auth + Référentiels  | 2-3 sessions       | Lot 0       |
+| Lot 2 : Config semaine       | 1-2 sessions       | Lot 1       |
+| Lot 3 : Import Excel         | 2-3 sessions       | Lot 2       |
+| Lot 4 : Génération + Édition | 4-5 sessions       | Lot 3       |
+| Lot 5 : Export + Ré-import   | 2-3 sessions       | Lot 4       |
+| **Total**                    | **12-18 sessions** |             |
 
 ---
 
@@ -1579,11 +1637,11 @@ Setup     Référ.    Config    Import    Génér.    Export
 
 ### Environnements
 
-| Environnement | Hébergement | Base de données | Usage |
-|--------------|-------------|-----------------|-------|
-| **Local** | `next dev` (localhost:3000) | Supabase local ou projet dev | Développement |
-| **Preview** | Vercel (auto par PR) | Supabase projet dev | Validation |
-| **Production** | Vercel (branche main) | Supabase projet prod | Usage réel |
+| Environnement  | Hébergement                 | Base de données              | Usage         |
+| -------------- | --------------------------- | ---------------------------- | ------------- |
+| **Local**      | `next dev` (localhost:3000) | Supabase local ou projet dev | Développement |
+| **Preview**    | Vercel (auto par PR)        | Supabase projet dev          | Validation    |
+| **Production** | Vercel (branche main)       | Supabase projet prod         | Usage réel    |
 
 ### CI/CD
 
@@ -1596,6 +1654,7 @@ git push → Vercel auto-deploy
 ### Variables d'environnement Vercel
 
 Configurer dans les Settings du projet Vercel :
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
@@ -1624,4 +1683,4 @@ npx tsc --noEmit
 
 ---
 
-*Document généré le 2026-04-12 — Compagnon du PRD.md v1.0*
+_Document généré le 2026-04-12 — Compagnon du PRD.md v1.0_
