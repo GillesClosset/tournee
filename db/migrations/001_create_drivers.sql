@@ -1,4 +1,4 @@
--- supabase/migrations/001_create_drivers.sql
+-- db/migrations/001_create_drivers.sql
 
 CREATE TABLE public.drivers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -10,18 +10,8 @@ CREATE TABLE public.drivers (
 );
 
 -- RLS
-ALTER TABLE public.drivers ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read drivers"
-    ON public.drivers FOR SELECT
-    TO authenticated
-    USING (true);
 
-CREATE POLICY "Authenticated users can manage drivers"
-    ON public.drivers FOR ALL
-    TO authenticated
-    USING (true)
-    WITH CHECK (true);
 
 -- Trigger updated_at
 CREATE OR REPLACE FUNCTION public.set_updated_at()

@@ -1,4 +1,4 @@
--- supabase/migrations/006_create_mission_requests.sql
+-- db/migrations/006_create_mission_requests.sql
 
 CREATE TYPE public.mission_type AS ENUM ('accompagnement', 'recuperation', 'both');
 CREATE TYPE public.accompaniment_type AS ENUM ('scolaire', 'medical', 'loisir', 'famille', 'autre');
@@ -35,13 +35,8 @@ CREATE INDEX mission_requests_schedule_day_idx
 CREATE INDEX mission_requests_status_idx
     ON public.mission_requests(status);
 
-ALTER TABLE public.mission_requests ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read missions"
-    ON public.mission_requests FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage missions"
-    ON public.mission_requests FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER mission_requests_updated_at
     BEFORE UPDATE ON public.mission_requests

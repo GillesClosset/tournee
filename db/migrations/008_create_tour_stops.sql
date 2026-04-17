@@ -1,4 +1,4 @@
--- supabase/migrations/008_create_tour_stops.sql
+-- db/migrations/008_create_tour_stops.sql
 
 CREATE TABLE public.tour_stops (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -23,13 +23,8 @@ CREATE TABLE public.tour_stops (
 CREATE INDEX tour_stops_tour_idx ON public.tour_stops(tour_id);
 CREATE INDEX tour_stops_mission_idx ON public.tour_stops(mission_request_id);
 
-ALTER TABLE public.tour_stops ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read tour_stops"
-    ON public.tour_stops FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage tour_stops"
-    ON public.tour_stops FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER tour_stops_updated_at
     BEFORE UPDATE ON public.tour_stops

@@ -1,4 +1,4 @@
--- supabase/migrations/003_create_locations.sql
+-- db/migrations/003_create_locations.sql
 
 CREATE TYPE public.location_type AS ENUM ('villa', 'rdv');
 
@@ -23,13 +23,8 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE INDEX locations_name_trgm_idx ON public.locations
     USING gin (name gin_trgm_ops);
 
-ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read locations"
-    ON public.locations FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage locations"
-    ON public.locations FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER locations_updated_at
     BEFORE UPDATE ON public.locations

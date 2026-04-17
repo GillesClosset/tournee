@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tournée Nath
 
-## Getting Started
+Outil de planification de tournées pour le Foyer de l'Enfance — optimisation automatique des trajets chauffeurs.
 
-First, run the development server:
+## Stack technique
+
+- **Framework** : Next.js 16 (App Router, TypeScript)
+- **UI** : Tailwind CSS v4, shadcn/ui
+- **Base de données** : PostgreSQL (Coolify-managed on VPS)
+- **ORM** : Drizzle ORM + node-postgres
+- **Hébergement** : Coolify (self-hosted PaaS)
+- **Domaine** : `tournee.chezgilles.ovh`
+
+## Développement local
 
 ```bash
+# Cloner le repo
+git clone https://github.com/GillesClosset/tournee.git
+cd tournee
+
+# Installer les dépendances
+npm install
+
+# Configurer les variables d'environnement
+cp .env.example .env.local
+# Remplir DATABASE_URL, ORS_API_KEY, ORS_BASE_URL dans .env.local
+
+# Lancer le serveur de développement
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Base de données
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Avec Drizzle Kit (recommandé)
 
-## Learn More
+```bash
+npx drizzle-kit push       # Pousser le schéma vers la DB
+npx drizzle-kit generate   # Générer une migration SQL depuis le diff du schéma
+npx drizzle-kit studio     # Navigateur visuel à https://local.drizzle.studio
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Avec SQL brut
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+psql $DATABASE_URL -f db/migrations/001_create_drivers.sql
+# ... appliquer chaque fichier dans l'ordre
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts disponibles
 
-## Deploy on Vercel
+| Commande               | Description                      |
+| ---------------------- | -------------------------------- |
+| `npm run dev`          | Serveur de développement         |
+| `npm run build`        | Build de production (standalone) |
+| `npm run start`        | Démarrer le build de production  |
+| `npm run test`         | Tests unitaires (Vitest)         |
+| `npm run lint`         | Linting (ESLint)                 |
+| `npm run format`       | Formatage (Prettier)             |
+| `npm run format:check` | Vérification du formatage        |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Déploiement en production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le déploiement se fait via **Coolify** sur un VPS. Voir [ARCHITECTURE.md § 12](./ARCHITECTURE.md#12-environnements--déploiement) pour les instructions détaillées.
+
+En résumé :
+
+1. Coolify build l'image Docker depuis le `Dockerfile` à la racine
+2. Les variables d'environnement sont configurées dans Coolify
+3. Auto-deploy sur push vers `main`
+
+## Repo GitHub
+
+[https://github.com/GillesClosset/tournee](https://github.com/GillesClosset/tournee)

@@ -1,4 +1,4 @@
--- supabase/migrations/007_create_tours.sql
+-- db/migrations/007_create_tours.sql
 
 CREATE TYPE public.tour_status AS ENUM ('generated', 'modified', 'confirmed');
 
@@ -17,13 +17,8 @@ CREATE TABLE public.tours (
 
 CREATE INDEX tours_schedule_idx ON public.tours(schedule_id);
 
-ALTER TABLE public.tours ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read tours"
-    ON public.tours FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage tours"
-    ON public.tours FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER tours_updated_at
     BEFORE UPDATE ON public.tours

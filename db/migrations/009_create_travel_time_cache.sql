@@ -1,4 +1,4 @@
--- supabase/migrations/009_create_travel_time_cache.sql
+-- db/migrations/009_create_travel_time_cache.sql
 
 CREATE TABLE public.travel_time_cache (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -26,10 +26,5 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-ALTER TABLE public.travel_time_cache ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read cache"
-    ON public.travel_time_cache FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage cache"
-    ON public.travel_time_cache FOR ALL TO authenticated USING (true) WITH CHECK (true);

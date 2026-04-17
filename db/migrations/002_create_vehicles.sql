@@ -1,4 +1,4 @@
--- supabase/migrations/002_create_vehicles.sql
+-- db/migrations/002_create_vehicles.sql
 
 CREATE TABLE public.vehicles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -10,13 +10,8 @@ CREATE TABLE public.vehicles (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE public.vehicles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read vehicles"
-    ON public.vehicles FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage vehicles"
-    ON public.vehicles FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER vehicles_updated_at
     BEFORE UPDATE ON public.vehicles

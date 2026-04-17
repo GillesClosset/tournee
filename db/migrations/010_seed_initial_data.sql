@@ -1,4 +1,4 @@
--- supabase/migrations/010_seed_initial_data.sql
+-- db/migrations/010_seed_initial_data.sql
 
 -- Chauffeurs
 INSERT INTO public.drivers (name, notes) VALUES

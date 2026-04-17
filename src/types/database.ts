@@ -1,3 +1,21 @@
-// Auto-generated Supabase types will go here
-// For now, re-export from supabase types
-export type { Database } from '@/lib/supabase/types'
+// Re-export all table types from Drizzle schema
+export type {
+  Driver,
+  InsertDriver,
+  Vehicle,
+  InsertVehicle,
+  Location,
+  InsertLocation,
+  WeeklySchedule,
+  InsertWeeklySchedule,
+  DriverAvailability,
+  InsertDriverAvailability,
+  MissionRequest,
+  InsertMissionRequest,
+  Tour,
+  InsertTour,
+  TourStop,
+  InsertTourStop,
+  TravelTimeCache,
+  InsertTravelTimeCache,
+} from '@/lib/db/schema'

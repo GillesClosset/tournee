@@ -1,4 +1,4 @@
--- supabase/migrations/005_create_driver_availabilities.sql
+-- db/migrations/005_create_driver_availabilities.sql
 
 CREATE TABLE public.driver_availabilities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -19,13 +19,8 @@ CREATE TABLE public.driver_availabilities (
 CREATE INDEX driver_avail_schedule_day_idx
     ON public.driver_availabilities(schedule_id, day_of_week);
 
-ALTER TABLE public.driver_availabilities ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Authenticated users can read availabilities"
-    ON public.driver_availabilities FOR SELECT TO authenticated USING (true);
 
-CREATE POLICY "Authenticated users can manage availabilities"
-    ON public.driver_availabilities FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE TRIGGER driver_availabilities_updated_at
     BEFORE UPDATE ON public.driver_availabilities

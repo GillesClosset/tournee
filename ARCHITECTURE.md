@@ -30,20 +30,21 @@
 
 > **Règle absolue** : utiliser la dernière version stable de chaque dépendance au moment du `create-next-app`. Vérifier via `npm info <package> version` avant chaque ajout.
 
-| Technologie         | Version cible                               | Rôle                                   |
-| ------------------- | ------------------------------------------- | -------------------------------------- |
-| **Next.js**         | ^15.5 (App Router)                          | Framework fullstack (SSR + API Routes) |
-| **React**           | ^19.0                                       | UI library                             |
-| **TypeScript**      | ^5.9                                        | Typage statique                        |
-| **Tailwind CSS**    | ^4.0                                        | Utility-first CSS                      |
-| **shadcn/ui**       | latest (CLI)                                | Composants UI accessibles              |
-| **Supabase**        | @supabase/supabase-js ^2.45 + @supabase/ssr | BDD + Auth                             |
-| **ExcelJS**         | ^4.4                                        | Lecture/écriture Excel (.xlsx)         |
-| **Zod**             | ^3.23                                       | Validation de schémas (API + forms)    |
-| **React Hook Form** | ^7.53                                       | Gestion des formulaires                |
-| **dnd-kit**         | @dnd-kit/core ^6                            | Drag & drop pour réordonnancement      |
-| **date-fns**        | ^4.1                                        | Manipulation de dates/heures           |
-| **Lucide React**    | latest                                      | Icônes                                 |
+| Technologie         | Version cible                    | Rôle                                   |
+| ------------------- | -------------------------------- | -------------------------------------- |
+| **Next.js**         | ^15.5 (App Router)               | Framework fullstack (SSR + API Routes) |
+| **React**           | ^19.0                            | UI library                             |
+| **TypeScript**      | ^5.9                             | Typage statique                        |
+| **Tailwind CSS**    | ^4.0                             | Utility-first CSS                      |
+| **shadcn/ui**       | latest (CLI)                     | Composants UI accessibles              |
+| **PostgreSQL**      | ^16 (Coolify-managed)            | Base de données                        |
+| **Drizzle ORM**     | drizzle-orm + node-postgres (pg) | ORM type-safe                          |
+| **ExcelJS**         | ^4.4                             | Lecture/écriture Excel (.xlsx)         |
+| **Zod**             | ^3.23                            | Validation de schémas (API + forms)    |
+| **React Hook Form** | ^7.53                            | Gestion des formulaires                |
+| **dnd-kit**         | @dnd-kit/core ^6                 | Drag & drop pour réordonnancement      |
+| **date-fns**        | ^4.1                             | Manipulation de dates/heures           |
+| **Lucide React**    | latest                           | Icônes                                 |
 
 ### Dépendances de développement
 
@@ -60,26 +61,26 @@
 
 ```
 tournee-nath/
-├── .env.local                          # Variables d'environnement (Supabase, ORS)
+├── .env.local                          # Variables d'environnement (PostgreSQL, ORS)
 ├── .env.example                        # Template des variables
-├── next.config.ts                      # Config Next.js
-├── tailwind.config.ts                  # Config Tailwind
+├── next.config.ts                      # Config Next.js (output: standalone)
+├── drizzle.config.ts                   # Config Drizzle Kit
+├── Dockerfile                          # Multi-stage build pour Coolify
 ├── tsconfig.json
 ├── package.json
 │
-├── supabase/
-│   ├── migrations/                     # Migrations SQL ordonnées
-│   │   ├── 001_create_drivers.sql
-│   │   ├── 002_create_vehicles.sql
-│   │   ├── 003_create_locations.sql
-│   │   ├── 004_create_weekly_schedules.sql
-│   │   ├── 005_create_driver_availabilities.sql
-│   │   ├── 006_create_mission_requests.sql
-│   │   ├── 007_create_tours.sql
-│   │   ├── 008_create_tour_stops.sql
-│   │   ├── 009_create_travel_time_cache.sql
-│   │   └── 010_seed_initial_data.sql
-│   └── config.toml                     # Config Supabase local
+├── db/
+│   └── migrations/                     # Migrations SQL (plain PostgreSQL)
+│       ├── 001_create_drivers.sql
+│       ├── 002_create_vehicles.sql
+│       ├── 003_create_locations.sql
+│       ├── 004_create_weekly_schedules.sql
+│       ├── 005_create_driver_availabilities.sql
+│       ├── 006_create_mission_requests.sql
+│       ├── 007_create_tours.sql
+│       ├── 008_create_tour_stops.sql
+│       ├── 009_create_travel_time_cache.sql
+│       └── 010_seed_initial_data.sql
 │
 ├── src/
 │   ├── app/                            # Next.js App Router
@@ -189,11 +190,9 @@ tournee-nath/
 │   │       └── tour-summary.tsx       # Résumé / stats de la tournée
 │   │
 │   ├── lib/                            # Logique métier & utilitaires
-│   │   ├── supabase/
-│   │   │   ├── client.ts              # Client navigateur
-│   │   │   ├── server.ts             # Client serveur (API routes)
-│   │   │   ├── middleware.ts          # Auth middleware
-│   │   │   └── types.ts              # Types générés depuis Supabase
+│   │   ├── db/
+│   │   │   ├── index.ts               # Client Drizzle (pool PostgreSQL)
+│   │   │   └── schema.ts             # Définitions tables/enums Drizzle
 │   │   │
 │   │   ├── routing/
 │   │   │   ├── ors-client.ts          # Client OpenRouteService
@@ -240,7 +239,7 @@ tournee-nath/
 │   │   └── use-toast.ts
 │   │
 │   └── types/                          # Types TypeScript globaux
-│       ├── database.ts                # Types Supabase (auto-gen)
+│       ├── database.ts                # Types Drizzle (re-export depuis schema)
 │       ├── domain.ts                  # Types domaine métier
 │       └── api.ts                     # Types requêtes/réponses API
 │
@@ -272,7 +271,7 @@ tournee-nath/
 ### 3.1 Migration 001 — drivers
 
 ```sql
--- supabase/migrations/001_create_drivers.sql
+-- db/migrations/001_create_drivers.sql
 
 CREATE TABLE public.drivers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -314,7 +313,7 @@ CREATE TRIGGER drivers_updated_at
 ### 3.2 Migration 002 — vehicles
 
 ```sql
--- supabase/migrations/002_create_vehicles.sql
+-- db/migrations/002_create_vehicles.sql
 
 CREATE TABLE public.vehicles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -342,7 +341,7 @@ CREATE TRIGGER vehicles_updated_at
 ### 3.3 Migration 003 — locations
 
 ```sql
--- supabase/migrations/003_create_locations.sql
+-- db/migrations/003_create_locations.sql
 
 CREATE TYPE public.location_type AS ENUM ('villa', 'rdv');
 
@@ -383,7 +382,7 @@ CREATE TRIGGER locations_updated_at
 ### 3.4 Migration 004 — weekly_schedules
 
 ```sql
--- supabase/migrations/004_create_weekly_schedules.sql
+-- db/migrations/004_create_weekly_schedules.sql
 
 CREATE TYPE public.schedule_status AS ENUM ('draft', 'configured', 'imported', 'generated', 'modified', 'confirmed');
 
@@ -412,7 +411,7 @@ CREATE TRIGGER weekly_schedules_updated_at
 ### 3.5 Migration 005 — driver_availabilities
 
 ```sql
--- supabase/migrations/005_create_driver_availabilities.sql
+-- db/migrations/005_create_driver_availabilities.sql
 
 CREATE TABLE public.driver_availabilities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -453,7 +452,7 @@ CREATE TRIGGER driver_availabilities_updated_at
 ### 3.6 Migration 006 — mission_requests
 
 ```sql
--- supabase/migrations/006_create_mission_requests.sql
+-- db/migrations/006_create_mission_requests.sql
 
 CREATE TYPE public.mission_type AS ENUM ('accompagnement', 'recuperation', 'both');
 CREATE TYPE public.accompaniment_type AS ENUM ('scolaire', 'medical', 'loisir', 'famille', 'autre');
@@ -506,7 +505,7 @@ CREATE TRIGGER mission_requests_updated_at
 ### 3.7 Migration 007 — tours
 
 ```sql
--- supabase/migrations/007_create_tours.sql
+-- db/migrations/007_create_tours.sql
 
 CREATE TYPE public.tour_status AS ENUM ('generated', 'modified', 'confirmed');
 
@@ -541,7 +540,7 @@ CREATE TRIGGER tours_updated_at
 ### 3.8 Migration 008 — tour_stops
 
 ```sql
--- supabase/migrations/008_create_tour_stops.sql
+-- db/migrations/008_create_tour_stops.sql
 
 CREATE TABLE public.tour_stops (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -582,7 +581,7 @@ CREATE TRIGGER tour_stops_updated_at
 ### 3.9 Migration 009 — travel_time_cache
 
 ```sql
--- supabase/migrations/009_create_travel_time_cache.sql
+-- db/migrations/009_create_travel_time_cache.sql
 
 CREATE TABLE public.travel_time_cache (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -624,7 +623,7 @@ CREATE POLICY "Authenticated users can manage cache"
 ### 3.10 Migration 010 — seed (données initiales)
 
 ```sql
--- supabase/migrations/010_seed_initial_data.sql
+-- db/migrations/010_seed_initial_data.sql
 
 -- Chauffeurs
 INSERT INTO public.drivers (name, notes) VALUES
@@ -665,7 +664,7 @@ vehicles ──┘         │                                  │
 
 - **Base path** : `/api/`
 - **Format** : JSON
-- **Auth** : Bearer token (Supabase session) — vérifié par middleware
+- **Auth** : Bearer token — vérifié par middleware (non implémenté actuellement)
 - **Erreurs** : `{ error: string, details?: unknown }`
 - **Pagination** : `?page=1&limit=20` (quand applicable)
 - **Validation** : Zod côté serveur, erreurs 400 avec détails
@@ -988,7 +987,7 @@ Calcule la matrice des temps de trajet (avec cache).
 ### 5.1 Hiérarchie des pages
 
 ```
-app/layout.tsx                    ← Auth guard + Sidebar + Header
+app/layout.tsx                    ← Sidebar + Header
 ├── app/page.tsx                  ← Dashboard (résumé semaine active)
 ├── app/login/page.tsx            ← Login (pas de sidebar)
 │
@@ -1456,32 +1455,15 @@ async function generateExportExcel(
 
 ## 10. Authentification & Sécurité
 
-### Setup Supabase Auth
+### Setup Auth
 
-- **Provider** : Email/Password uniquement.
-- **Single user** : Nath crée son compte via une page d'inscription initiale (protégée ou seed).
-- **Session** : Cookie httpOnly, géré par `@supabase/ssr`.
-
-### Middleware Next.js
-
-```typescript
-// src/middleware.ts
-// Vérifie la session Supabase sur chaque requête
-// Redirige vers /login si non authentifié
-// Exclut : /login, /api/auth/*, assets statiques
-```
-
-### Row Level Security (RLS)
-
-Toutes les tables ont RLS activé. Les policies autorisent tout pour les utilisateurs `authenticated`. C'est suffisant pour un single user. En cas de multi-user futur, les policies devront être raffinées avec `auth.uid()`.
+> **Note** : Aucune authentification n'est actuellement implémentée. L'ancienne dépendance Supabase Auth a été retirée. Si une authentification est nécessaire à l'avenir, elle sera ajoutée via NextAuth.js / Auth.js.
 
 ### Variables d'environnement
 
 ```bash
 # .env.example
-NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...          # Uniquement côté serveur
+DATABASE_URL=postgresql://user:password@localhost:5432/tournee
 ORS_API_KEY=your_openrouteservice_key
 ORS_BASE_URL=https://api.openrouteservice.org
 ```
@@ -1516,12 +1498,12 @@ Setup     Référ.    Config    Import    Génér.    Export
 | ------------------------------------------------------- | ------------------------------------------------- |
 | `create-next-app` avec TypeScript, Tailwind, App Router | `next.config.ts`, `tsconfig.json`, `package.json` |
 | Installer shadcn/ui + composants de base                | `src/components/ui/*`                             |
-| Configurer Supabase (projet + .env)                     | `.env.local`, `.env.example`                      |
-| Créer toutes les migrations SQL                         | `supabase/migrations/*`                           |
-| Exécuter les migrations + seed                          | Via Supabase Dashboard ou CLI                     |
+| Configurer PostgreSQL (projet + .env)                   | `.env.local`, `.env.example`                      |
+| Créer toutes les migrations SQL                         | `db/migrations/*`                                 |
+| Exécuter les migrations + seed                          | Via `drizzle-kit push` ou `psql`                  |
 | Configurer le layout racine + sidebar                   | `src/app/layout.tsx`, `src/components/layout/*`   |
 | Configurer ESLint + Prettier                            | `.eslintrc.json`, `.prettierrc`                   |
-| Premier déploiement Vercel (vide)                       | `vercel.json` (si nécessaire)                     |
+| Premier déploiement Coolify                             | Dockerfile                                        |
 
 **Validation** : L'app se lance en local, la DB est accessible, le layout s'affiche.
 
@@ -1533,8 +1515,8 @@ Setup     Référ.    Config    Import    Génér.    Export
 
 | Tâche                                 | Fichiers                                                                                 |
 | ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Page login + Supabase Auth            | `src/app/login/page.tsx`                                                                 |
-| Middleware auth                       | `src/middleware.ts`, `src/lib/supabase/*`                                                |
+| Page login + Auth                     | `src/app/login/page.tsx`                                                                 |
+| Middleware auth                       | `src/middleware.ts`, `src/lib/db/*`                                                      |
 | CRUD Chauffeurs                       | `src/app/referentiels/chauffeurs/page.tsx`, `src/app/api/drivers/route.ts`, composants   |
 | CRUD Véhicules                        | `src/app/referentiels/vehicules/page.tsx`, `src/app/api/vehicles/route.ts`, composants   |
 | CRUD Points de passage + géocodage    | `src/app/referentiels/points-de-passage/page.tsx`, `src/app/api/locations/*`, composants |
@@ -1637,29 +1619,39 @@ Setup     Référ.    Config    Import    Génér.    Export
 
 ### Environnements
 
-| Environnement  | Hébergement                 | Base de données              | Usage         |
-| -------------- | --------------------------- | ---------------------------- | ------------- |
-| **Local**      | `next dev` (localhost:3000) | Supabase local ou projet dev | Développement |
-| **Preview**    | Vercel (auto par PR)        | Supabase projet dev          | Validation    |
-| **Production** | Vercel (branche main)       | Supabase projet prod         | Usage réel    |
+| Environnement  | Hébergement                   | Base de données                  | Usage         |
+| -------------- | ----------------------------- | -------------------------------- | ------------- |
+| **Local**      | `next dev` (localhost:3000)   | PostgreSQL (VPS ou local Docker) | Développement |
+| **Production** | Coolify (VPS, branche `main`) | PostgreSQL (même VPS, Coolify)   | Usage réel    |
+
+### Domaine
+
+`tournee.chezgilles.ovh` — SSL géré automatiquement par Coolify (Let's Encrypt).
 
 ### CI/CD
 
 ```
-git push → Vercel auto-deploy
-  ├── Preview (branches feature/*)
-  └── Production (branche main)
+git push main → Coolify webhook → build Dockerfile → deploy
 ```
 
-### Variables d'environnement Vercel
+### Déploiement pas à pas
 
-Configurer dans les Settings du projet Vercel :
+1. **PostgreSQL** : Service déjà en cours sur Coolify
+2. **Migrations** : `psql $DATABASE_URL -f db/migrations/001_create_drivers.sql` (etc.) ou `npx drizzle-kit push`
+3. **Application** : Coolify → Create Application → GitHub repo → Dockerfile → Port 3000 → Domaine `tournee.chezgilles.ovh`
+4. **Variables d'environnement** dans Coolify :
+   - `DATABASE_URL`
+   - `ORS_API_KEY`
+   - `ORS_BASE_URL`
+5. **Auto-deploy** : Activer le webhook GitHub dans Coolify
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `ORS_API_KEY`
-- `ORS_BASE_URL`
+### Drizzle Kit — Commandes utiles
+
+```bash
+npx drizzle-kit push      # Pousser le schéma vers la DB (dev)
+npx drizzle-kit generate  # Générer une migration SQL depuis le diff du schéma
+npx drizzle-kit studio    # Navigateur visuel à https://local.drizzle.studio
+```
 
 ### Commandes
 
