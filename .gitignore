@@ -40,6 +40,9 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Drizzle runtime state (generated at deploy time)
+db/migrations/meta/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
