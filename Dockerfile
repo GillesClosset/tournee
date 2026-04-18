@@ -1,8 +1,3 @@
-FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --only=production
-
 FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -38,5 +33,7 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Enable pg_trgm (needed for locations name search index), then run migrations, then start app
-CMD ["sh", "-c", "npx drizzle-kit migrate && node server.js"]
+# Run migrations then start the standalone server.
+# Uses npm start so the behavior matches whether Coolify uses the Dockerfile CMD
+# or overrides it with "npm run start".
+CMD ["npm", "run", "start"]
