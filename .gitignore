@@ -48,3 +48,6 @@ next-env.d.ts
 
 # OpenCode
 .opencode/
+
+# Agent context (server-specific secrets, infra details)
+.agents/
