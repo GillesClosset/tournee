@@ -40,8 +40,7 @@ yarn-error.log*
 # Vercel
 .vercel
 
-# Drizzle runtime state (generated at deploy time)
-db/migrations/meta/
+# Drizzle — migrations must be committed; do not ignore them
 
 # TypeScript
 *.tsbuildinfo
