@@ -44,7 +44,13 @@ export default async function WeekPage({ params }: { params: Promise<{ weekId: s
 
   const steps: StepDef[] = [
     { label: 'Configuration', href: `/planning/${weekId}/configuration`, enabled: true },
-    { label: 'Import', href: `/planning/${weekId}/import`, enabled: false },
+    {
+      label: 'Import',
+      href: `/planning/${weekId}/import`,
+      enabled: ['configured', 'imported', 'generated', 'modified', 'confirmed'].includes(
+        schedule.status,
+      ),
+    },
     { label: 'Tournées', href: `/planning/${weekId}/tournees`, enabled: false },
     { label: 'Export', href: `/planning/${weekId}/export`, enabled: false },
   ]
