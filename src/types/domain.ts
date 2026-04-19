@@ -126,6 +126,8 @@ export interface TourWithStops {
 
 export interface TourStopWithRelations extends TourStopDomain {
   locationName: string | null
+  locationLatitude: number | null
+  locationLongitude: number | null
   missionText: string | null
   minorName: string | null
   missionType: 'accompagnement' | 'recuperation' | 'both' | null

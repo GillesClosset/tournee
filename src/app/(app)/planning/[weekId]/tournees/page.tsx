@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm'
 import { fetchToursWithRelations } from '@/lib/db/queries/tours'
 import { TourViewer } from '@/components/planning/tour-viewer'
 import type { ScheduleStatus } from '@/types/domain'
+import 'leaflet/dist/leaflet.css'
 
 const VIEWABLE_STATUSES: ScheduleStatus[] = ['generated', 'modified', 'confirmed']
 

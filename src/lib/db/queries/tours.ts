@@ -59,6 +59,8 @@ export async function fetchToursWithRelations(scheduleId: string): Promise<Tours
     manualTaskText: string | null
     notes: string | null
     locationName: string | null
+    locationLatitude: number | null
+    locationLongitude: number | null
     missionText: string | null
     minorName: string | null
     missionType: 'accompagnement' | 'recuperation' | 'both' | null
@@ -84,6 +86,8 @@ export async function fetchToursWithRelations(scheduleId: string): Promise<Tours
           manualTaskText: tourStops.manualTaskText,
           notes: tourStops.notes,
           locationName: locations.name,
+          locationLatitude: locations.latitude,
+          locationLongitude: locations.longitude,
           missionText: missionRequests.missionText,
           minorName: missionRequests.minorName,
           missionType: missionRequests.missionType,
@@ -117,6 +121,8 @@ export async function fetchToursWithRelations(scheduleId: string): Promise<Tours
       manualTaskText: stop.manualTaskText,
       notes: stop.notes,
       locationName: stop.locationName,
+      locationLatitude: stop.locationLatitude,
+      locationLongitude: stop.locationLongitude,
       missionText: stop.missionText,
       minorName: stop.minorName,
       missionType: stop.missionType,

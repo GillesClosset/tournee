@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TourMapDynamic } from '@/components/planning/tour-map-dynamic'
 import type {
   ToursPageData,
   TourViewData,
@@ -104,7 +105,17 @@ function StopRow({ stop, index }: { stop: TourStopWithRelations; index: number }
   )
 }
 
-function TourCard({ tour }: { tour: TourViewData }) {
+function TourCard({
+  tour,
+  isActive,
+  onSelect,
+  cardRef,
+}: {
+  tour: TourViewData
+  isActive: boolean
+  onSelect: () => void
+  cardRef?: React.Ref<HTMLDivElement>
+}) {
   const [expanded, setExpanded] = useState(false)
   const firstStop = tour.stops[0]
   const lastStop = tour.stops[tour.stops.length - 1]
@@ -114,8 +125,14 @@ function TourCard({ tour }: { tour: TourViewData }) {
       : `${formatTime(tour.startTime)} → ${formatTime(tour.endTime)}`
 
   return (
-    <Card>
-      <div className="cursor-pointer p-4" onClick={() => setExpanded(!expanded)}>
+    <Card ref={cardRef} className={isActive ? 'ring-2 ring-primary' : ''}>
+      <div
+        className="cursor-pointer p-4"
+        onClick={() => {
+          onSelect()
+          setExpanded(!expanded)
+        }}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-semibold">{tour.driverName}</span>
@@ -190,6 +207,23 @@ function UnassignedSection({ missions }: { missions: UnassignedMission[] }) {
 }
 
 export function TourViewer({ data }: { data: ToursPageData }) {
+  const [activeTourId, setActiveTourId] = useState<string | null>(null)
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+
+  const setCardRef = useCallback(
+    (tourId: string) => (el: HTMLDivElement | null) => {
+      if (el) cardRefs.current.set(tourId, el)
+      else cardRefs.current.delete(tourId)
+    },
+    [],
+  )
+
+  const handleMapTourSelect = useCallback((tourId: string) => {
+    setActiveTourId((prev) => (prev === tourId ? null : tourId))
+    const el = cardRefs.current.get(tourId)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [])
+
   // Group tours by day
   const toursByDay = new Map<number, TourViewData[]>()
   for (const tour of data.tours) {
@@ -213,7 +247,48 @@ export function TourViewer({ data }: { data: ToursPageData }) {
     <div className="space-y-4">
       <SummaryBar data={data} />
 
-      {daysWithTours.length > 0 && (
+      {data.tours.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="h-[400px] lg:h-[600px]">
+            <TourMapDynamic
+              tours={data.tours}
+              activeTourId={activeTourId}
+              onTourSelect={handleMapTourSelect}
+            />
+          </div>
+
+          <div className="min-h-0 lg:max-h-[600px] lg:overflow-y-auto">
+            {daysWithTours.length > 0 && (
+              <Tabs defaultValue={defaultDay}>
+                <TabsList>
+                  {daysWithTours.map((day) => (
+                    <TabsTrigger key={day} value={day.toString()}>
+                      {DAY_SHORT[day]} ({toursByDay.get(day)?.length ?? 0})
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                {daysWithTours.map((day) => (
+                  <TabsContent key={day} value={day.toString()} className="space-y-3 mt-3">
+                    {toursByDay.get(day)?.map((tour) => (
+                      <TourCard
+                        key={tour.id}
+                        tour={tour}
+                        isActive={activeTourId === tour.id}
+                        onSelect={() =>
+                          setActiveTourId((prev) => (prev === tour.id ? null : tour.id))
+                        }
+                        cardRef={setCardRef(tour.id)}
+                      />
+                    ))}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            )}
+          </div>
+        </div>
+      )}
+
+      {daysWithTours.length > 0 && data.tours.length === 0 && (
         <Tabs defaultValue={defaultDay}>
           <TabsList>
             {daysWithTours.map((day) => (
@@ -222,13 +297,6 @@ export function TourViewer({ data }: { data: ToursPageData }) {
               </TabsTrigger>
             ))}
           </TabsList>
-          {daysWithTours.map((day) => (
-            <TabsContent key={day} value={day.toString()} className="space-y-3 mt-3">
-              {toursByDay.get(day)?.map((tour) => (
-                <TourCard key={tour.id} tour={tour} />
-              ))}
-            </TabsContent>
-          ))}
         </Tabs>
       )}
 
