@@ -6,10 +6,12 @@ import { weeklySchedules } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { fetchToursWithRelations } from '@/lib/db/queries/tours'
 import { TourViewer } from '@/components/planning/tour-viewer'
+import { TourEditorWrapper } from '@/components/planning/tour-editor-wrapper'
 import type { ScheduleStatus } from '@/types/domain'
 import 'leaflet/dist/leaflet.css'
 
 const VIEWABLE_STATUSES: ScheduleStatus[] = ['generated', 'modified', 'confirmed']
+const EDITABLE_STATUSES: ScheduleStatus[] = ['generated', 'modified']
 
 export default async function TourneesPage({ params }: { params: Promise<{ weekId: string }> }) {
   const session = await auth()
@@ -41,6 +43,7 @@ export default async function TourneesPage({ params }: { params: Promise<{ weekI
   }
 
   const data = await fetchToursWithRelations(weekId)
+  const isEditable = EDITABLE_STATUSES.includes(schedule.status as ScheduleStatus)
 
   return (
     <div className="flex flex-col gap-4">
@@ -53,7 +56,11 @@ export default async function TourneesPage({ params }: { params: Promise<{ weekI
         </Link>
         <h1 className="text-xl font-semibold">Tournées</h1>
       </div>
-      <TourViewer data={data} />
+      {isEditable ? (
+        <TourEditorWrapper data={data} scheduleId={weekId} />
+      ) : (
+        <TourViewer data={data} />
+      )}
     </div>
   )
 }

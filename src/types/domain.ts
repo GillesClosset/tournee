@@ -164,3 +164,7 @@ export interface ToursPageData {
   unassigned: UnassignedMission[]
   summary: GenerationSummary
 }
+
+// ─── Tour editing types (Lot: tour-manual-editing) ───────────────────────────
+
+export type { TourEditAction, TourEditPayload } from '@/lib/validators/tour-edits'
