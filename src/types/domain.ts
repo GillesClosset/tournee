@@ -168,3 +168,20 @@ export interface ToursPageData {
 // ─── Tour editing types (Lot: tour-manual-editing) ───────────────────────────
 
 export type { TourEditAction, TourEditPayload } from '@/lib/validators/tour-edits'
+
+// ─── Dashboard types ─────────────────────────────────────────────────────────
+
+export interface DashboardData {
+  schedule: {
+    id: string
+    weekStartDate: string
+    status: ScheduleStatus
+  } | null
+  stats: {
+    totalTours: number
+    totalStops: number
+    totalUnassigned: number
+    totalTravelMinutes: number
+  }
+  perDay: Array<{ dayOfWeek: number; tourCount: number }>
+}
