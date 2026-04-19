@@ -1,7 +1,13 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { Menu } from 'lucide-react'
 import { navLinks, isNavGroup } from './nav-links'
+import { Button } from '@/components/ui/button'
+
+interface HeaderProps {
+  onMenuClick?: () => void
+}
 
 function findLabelForPath(pathname: string): string {
   for (const item of navLinks) {
@@ -22,7 +28,6 @@ function buildBreadcrumbs(pathname: string): Array<{ label: string; href?: strin
 
   if (pathname === '/') return [{ label: 'Tableau de bord' }]
 
-  // Try to find matching nav items for breadcrumb segments
   const segments = pathname.split('/').filter(Boolean)
   let accumulated = ''
 
@@ -41,11 +46,22 @@ function buildBreadcrumbs(pathname: string): Array<{ label: string; href?: strin
   return crumbs
 }
 
-export function Header() {
+export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname()
   const breadcrumbs = buildBreadcrumbs(pathname)
   return (
-    <header className="flex h-12 shrink-0 items-center border-b border-border px-6">
+    <header className="flex h-12 shrink-0 items-center border-b border-border px-4 lg:px-6">
+      {/* Hamburger button — mobile only */}
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        className="mr-2 lg:hidden"
+        onClick={onMenuClick}
+        aria-label="Ouvrir le menu"
+      >
+        <Menu className="size-5" />
+      </Button>
+
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         {breadcrumbs.map((crumb, i) => (
           <span key={i} className="flex items-center gap-2">
