@@ -51,7 +51,11 @@ export default async function WeekPage({ params }: { params: Promise<{ weekId: s
         schedule.status,
       ),
     },
-    { label: 'Tournées', href: `/planning/${weekId}/tournees`, enabled: false },
+    {
+      label: 'Tournées',
+      href: `/planning/${weekId}/tournees`,
+      enabled: ['generated', 'modified', 'confirmed'].includes(schedule.status),
+    },
     { label: 'Export', href: `/planning/${weekId}/export`, enabled: false },
   ]
 

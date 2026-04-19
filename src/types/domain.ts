@@ -121,3 +121,44 @@ export interface TourWithStops {
   totalDistanceMeters: number | null
   stops: TourStopDomain[]
 }
+
+// ─── Enriched tour view types (Lot 5) ────────────────────────────────────────
+
+export interface TourStopWithRelations extends TourStopDomain {
+  locationName: string | null
+  missionText: string | null
+  minorName: string | null
+  missionType: 'accompagnement' | 'recuperation' | 'both' | null
+  accompanimentType: 'scolaire' | 'medical' | 'loisir' | 'famille' | 'autre' | null
+}
+
+export interface TourViewData {
+  id: string
+  scheduleId: string
+  status: 'generated' | 'modified' | 'confirmed'
+  totalTravelMinutes: number | null
+  totalDistanceMeters: number | null
+  driverName: string
+  vehicleName: string | null
+  vehiclePlate: string | null
+  dayOfWeek: number
+  startTime: string
+  endTime: string
+  stops: TourStopWithRelations[]
+}
+
+export interface UnassignedMission {
+  id: string
+  dayOfWeek: number
+  minorName: string | null
+  missionText: string
+  requestedTime: string
+  locationName: string | null
+  reason: string
+}
+
+export interface ToursPageData {
+  tours: TourViewData[]
+  unassigned: UnassignedMission[]
+  summary: GenerationSummary
+}
